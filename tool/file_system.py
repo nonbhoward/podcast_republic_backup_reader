@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+import zipfile
 log = logging.getLogger(__name__)
 
 
@@ -61,3 +62,25 @@ def get_extension_from_(file_in_backup_path):
     if '.' not in str(file_in_backup_path):
         return None
     return str(file_in_backup_path).split('.')[1]
+
+
+def get_zipfile_at_(zipfile_path):
+    if not os.path.exists(zipfile_path):
+        exit_cause = f'file not found at {zipfile_path}'
+        log.exception(exit_cause)
+        print(f'{exit_cause}')
+        exit()
+    if not zipfile.is_zipfile(zipfile_path):
+        exit_cause = f'file not zipfile at {zipfile_path}'
+        log.exception(exit_cause)
+        print(f'{exit_cause}')
+        exit()
+    with zipfile.ZipFile(zipfile_path, 'r') as zip_file:
+        return zip_file
+
+
+def get_path_home():
+    home = os.getenv("HOME")
+    if not home:
+        log.exception(f'no path : {home}')
+    return home
