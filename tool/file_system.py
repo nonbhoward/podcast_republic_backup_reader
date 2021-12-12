@@ -84,3 +84,8 @@ def get_path_home():
     if not home:
         log.exception(f'no path : {home}')
     return home
+
+
+def get_parent_of_(path_to_archive):
+    parent_path = ''.join([ele + '/' for ele in path_to_archive.split('/')[1:-1]])
+    return parent_path
