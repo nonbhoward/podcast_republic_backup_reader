@@ -1,5 +1,7 @@
+import json
 import logging
 import os
+import sqlite3
 import zipfile
 from tool.file_system import get_list_of_backups_from_
 from tool.file_system import get_path_home
@@ -13,7 +15,7 @@ def extract_details_from_(zip_archives, decompress=False):
     for zip_archive in zip_archives:
         path_to_archive = get_path_to_(zip_archive)
         for file in zip_archive.filelist:
-            file_details = get_details_from_(file)
+            file_details = get_metadata_from_(file)
             file_details.update({
                 'parent': zip_archive,
                 'path to archive': path_to_archive
@@ -55,7 +57,7 @@ def get_path_to_(zip_archive):
     return zip_archive.filename
 
 
-def get_details_from_(file):
+def get_metadata_from_(file):
     file_details = {
         'crc': file.CRC,
         'compress_size': file.compress_size,
@@ -66,9 +68,10 @@ def get_details_from_(file):
     return file_details
 
 
-def delete_(decompressed_file):
+def rm_temp_zip_(decompressed_file):
     try:
         os.remove(decompressed_file)
+        log.debug(f'deleted file : {decompressed_file}')
     except Exception as exc:
         log.exception(f'failed to remove file')
         for arg in exc.args[0]:

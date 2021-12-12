@@ -98,5 +98,20 @@ def get_parent_of_(path_to_archive):
 
 def get_file_data_for_(file_path):
     command = [CommandLine.file, file_path]
-    file_data = subprocess.run(args=command, capture_output=True)
+    raw_output = subprocess.run(args=command, capture_output=True)
+    file_data = parse_cli_(raw_output)
     return file_data
+
+
+def parse_cli_(raw_output):
+    if raw_output.stderr:
+        log.error(f'{raw_output.stderr}')
+    output = raw_output.stdout.decode('ascii')
+    if ':' not in output:
+        log.exception(f'unexpected return : {output}')
+        exit()
+    output = output.split(':')
+    file_metadata = output[1]
+    if '\n' in file_metadata:
+        file_metadata = file_metadata.replace('\n', '')
+    return file_metadata
