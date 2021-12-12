@@ -1,8 +1,13 @@
 import logging
 import os
 import pathlib
+import subprocess
 import zipfile
 log = logging.getLogger(__name__)
+
+
+class CommandLine:
+    file = 'file'
 
 
 class Extension:
@@ -89,3 +94,9 @@ def get_path_home():
 def get_parent_of_(path_to_archive):
     parent_path = ''.join([ele + '/' for ele in path_to_archive.split('/')[1:-1]])
     return parent_path
+
+
+def get_file_data_for_(file_path):
+    command = [CommandLine.file, file_path]
+    file_data = subprocess.run(args=command, capture_output=True)
+    return file_data
