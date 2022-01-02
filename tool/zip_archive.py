@@ -28,10 +28,14 @@ def extract_details_from_(zip_archives, decompress=False):
                     decompressed_file = zip_file.extract(member=file)
                 with open(decompressed_file, 'r') as dzip_file:
                     file_data = get_file_data_for_(dzip_file.name)
+                    if 'SQLite' in file_data:
+                        database = sqlite3.connect(decompressed_file)
+                        archive_details[(path_to_archive, file.filename)].update({
+                            'database': database
+                        })
                 archive_details[(path_to_archive, file.filename)].update({
-                    'file_data': file_data
+                    'file_data': file_data,
                 })
-                delete_(decompressed_file)
     return archive_details
 
 
@@ -68,7 +72,7 @@ def get_metadata_from_(file):
     return file_details
 
 
-def rm_temp_zip_(decompressed_file):
+def remove_temporary_file_(decompressed_file):
     try:
         os.remove(decompressed_file)
         log.debug(f'deleted file : {decompressed_file}')
